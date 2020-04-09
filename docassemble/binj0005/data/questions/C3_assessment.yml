@@ -1,0 +1,118 @@
+---
+variable name: IJperson_info
+use objects: True
+data:
+  - Fistname: Jaafar
+    Lastname: Kamsan
+    Age: 65
+    Hobbies: Travelling 
+    Do you like pets?: True
+  - Firstname: Samaniah 
+    Lastname: Ali
+    Age: 60
+    Hobbies: Travelling 
+    Do you like pets?: True
+---
+code: |
+  IJpersonal_info_dnu = [
+    {'Firstname':'Jaafar', 'Lastname':'Kamsan', 'Age':65, 'Hobbies': 'Travelling', 'Do you like pets?': True},
+    {'Firstname':'Samananiah', 'Lastname':'Ali', 'Age':60, 'Hobbies': 'Travelling', 'Do you like pets?': True},
+  ]
+---
+mandatory: True
+question:  Your Information   
+subquestion: |
+  #### Data Table 
+  
+  ${ IJcolumn_header }
+  ${ IJdashes }
+  %for IJitem in IJtable_rows:
+  ${ IJitem }
+  %endfor
+  
+  *You will be asked to confirm if each piece of information is correct.
+buttons: 
+  - Continue: continue
+  - Exit: exit
+    url: http://www.courts.sa.gov.au/Pages/default.aspx 
+  - Restart: restart
+---
+code: |
+  IJcolumn_header = ""
+  
+  for IJitem in IJperson_info[0]:
+    IJcolumn_header += IJitem + '|'
+  
+  IJcolumn_header = IJcolumn_header[:-1]
+---
+code: |
+  IJdashes = '---'
+  for i in range(len(IJperson_info[0]) - 1):
+    IJdashes += '|---'
+---
+code: | 
+  IJtable_rows = []
+  
+  for IJitem in IJperson_info:
+      MDrow = ""
+      for IJkey in IJitem:
+        MDrow += str(IJitem[IJkey]) + '|'
+      MDrow = MDrow[:-1]
+      IJtable_rows.append(MDrow)
+---
+variable name: IJquestions
+use objects: True
+data: 
+  - IJquestions: Please confirm if each piece of information is correct for Jaafar
+    IJchoices:  
+      - Firstname:Jaafar
+      - Lastname:Kamsan
+      - Age:65
+      - Hobbies:Travelling
+      - Do you like pets?:True
+  - IJquestions: Please confirm if each piece of information is correct for Samaniah
+    IJchoices:
+      - Firstname:Samaniah
+      - Lastname:Ali
+      - Age:60
+      - Hobbies:Travelling
+      - Do you like pets?:True
+---
+mandatory: True
+question: Checkbox
+subquestion: |
+  ### Select the correct piece(s) of information.
+  
+  ${ IJquestions_table }
+attachment: 
+  docx template file: C3_advanced_jinja1.docx
+  valid formats:
+   - pdf 
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+table: IJquestions_table
+rows: IJquestions 
+columns: 
+  - Question: |
+      row_item['IJquestions']
+  - Selected answers: |
+      row_item['IJanswers'].true_values()
+  - No. Selected answers: |
+     len(row_item['IJanswers'].true_values())
+---
+question: |
+  ${ IJquestions[i]['IJquestions'] }
+fields:
+  - no label: IJquestions[i]['IJanswers']
+    datatype: checkboxes
+    code: IJquestions[i]['IJchoices'] 
+---
+code: |
+ for IJitem in IJperson_info:
+   IJitem['IJchoices'] = []
+   for IJkey in IJitem.keys (): 
+     if IJkey != 'IJchoices':
+       IJitem['IJchoices'].append('**{}'.format(IJkey, IJitem[IJkey]))
+---
