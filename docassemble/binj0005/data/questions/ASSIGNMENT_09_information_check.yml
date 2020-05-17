@@ -1,0 +1,99 @@
+---
+variable name: publicperson_info
+use objects: True
+data:
+  - Name: ${ public_salutation } ${ public_firstname } ${ public_middlename } ${      public_lastname }
+    Position : ${ position_of_complainant }
+    Venue: ${ target_venue }
+    Disabilities: ${ rel_disabilities }
+    Incident: ${ incident_type }
+    General Access Issue: ${ access_issue_general }
+    Other Access Issue: ${ access_issue_other }
+    Specific Access Issue: $ {access_issue_specific }
+    Confidentiality: ${ name_use }
+---
+mandatory: True
+question:  Information Checker 
+subquestion: |
+ #### Here is the information collected for you.
+ 
+ ${ publicquestion_table_first }
+ 
+ You will be asked to confirm each piece of information is correct.
+buttons:
+ - Continue: continue
+ - Exit: exit
+ - Restart: restart 
+---
+mandatory: True
+question: Your Information
+subquestion: |
+  #### Here is validated information collected for you.
+  
+  Information is displayed along with which items are correct.
+  
+  ${ publicquestion_table }
+
+buttons:
+ - Exit: exit
+ - Restart: restart 
+---
+table: publicquestion_table
+rows: publicperson_info
+columns:
+  - Name: |
+      row_item['Name']
+  - Position: |
+      row_item['Position']     
+  - Venue: |
+      row_item['Venue']
+  - Disabilities: |
+      row_item['Disabilities']
+  - Incident: |
+      row_item['Incident']
+  - General Access Issue: |
+      row_item['General Access Issue']
+  - Other Access Issue: |
+      row_item['Other Access Issue']
+  - Specific Access Issue: |
+      row_item['Specific Access Issue']
+  - Confidentiality: |
+      row_item['Confidentiality']
+  - Correct data: |
+      row_item['publicanswers'].true_values()
+---
+table: publicquestion_table_first
+rows: publicperson_info
+columns:
+   - Name: |
+      row_item['Name']
+  - Position: |
+      row_item['Position']     
+  - Venue: |
+      row_item['Venue']
+  - Disabilities: |
+      row_item['Disabilities']
+  - Incident: |
+      row_item['Incident']
+  - General Access Issue: |
+      row_item['General Access Issue']
+  - Other Access Issue: |
+      row_item['Other Access Issue']
+  - Specific Access Issue: |
+      row_item['Specific Access Issue']
+  - onfidentiality: |
+      row_item['Confidentiality']
+---
+question: |
+ Is the information below correct for ${ publicperson_info[i] ['Name'] }?
+fields:
+ - no label: publicperson_info[i]['publicanswers']
+   datatype: checkboxes
+   code: publicperson_info[i]['publicchoices']
+---
+code: |
+ publicperson_info[i]['publicchoices'] = []
+ for publickey in publicperson_info[i]:
+  if publickey != 'publicchoices':
+   publicperson_info[i]['publicchoices'].append('**{}:** {}' .format(publickey, publicperson_info[i][publickey]))   
+---
